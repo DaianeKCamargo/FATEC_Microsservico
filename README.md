@@ -92,9 +92,10 @@ Exemplo:<br>
 > <code>PUT /admin/aprovar/1</code>
 
 Resposta:
-> <code>{<br>
+
+> <code> {<br>
  "mensagem": "Ponto aprovado com sucesso"<br>
-}</code><br>
+}</code> <br>
 
 ### 🔎 Buscar pontos de coleta aprovados
 
