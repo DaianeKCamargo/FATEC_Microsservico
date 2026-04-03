@@ -61,8 +61,9 @@ Cria um novo cadastro de ponto de coleta.
  "endereco": "Rua das Flores 123",<br>
  "cidade": "Campinas"<br>
 }<br> <code>
+
 Resposta<br>
-<code>{<br>
+> <code>{<br>
  "mensagem": "Cadastro enviado para aprovação",<br>
  "ponto": {<br>
    "id": 1,
