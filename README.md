@@ -60,7 +60,8 @@ Cria um novo cadastro de ponto de coleta.
  "nome": "Pet Shop Central",<br>
  "endereco": "Rua das Flores 123",<br>
  "cidade": "Campinas"<br>
-} <code> <br> 
+} </code> <br> 
+
 Resposta<br>
 > <code>{<br>
  "mensagem": "Cadastro enviado para aprovação",<br>
