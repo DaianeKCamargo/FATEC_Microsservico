@@ -1,11 +1,11 @@
 # Microserviço de Pontos de Coleta – Tampets
 
 ### Integrantes:
-Daiane Kelly de Almeida Camargo
-Maria Eduarda Moreno Lopes
-Nícolas de Oliveira Dias
-Nicole Janine Bolzani Oliveira
-Sabrina Sant'Ana da Silva Alves 
+Daiane Kelly de Almeida Camargo;
+Maria Eduarda Moreno Lopes;
+Nícolas de Oliveira Dias;
+Nicole Janine Bolzani Oliveira;
+Sabrina Sant'Ana da Silva Alves;
 
 ### 📖 Descrição
 
