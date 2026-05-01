@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const axios = require('axios');
 
 app.use(express.json());
 
@@ -7,33 +8,13 @@ let pontos = [];
 let pontosAprovados = [];
 
 
-app.post("/pontos-coleta", (req, res) => {
-
-    const novoPonto = {
-        id: pontos.length + 1,
-        nome: req.body.nome,
-        endereco: req.body.endereco,
-        cidade: req.body.cidade,
-        status: "pendente"
-    };
-
-    pontos.push(novoPonto);
-
-    res.json({
-        mensagem: "Cadastro enviado para aprovação",
-        ponto: novoPonto
-    });
-
-});
-
 app.get("/admin/pontos-pendentes", (req, res) => {
-    const pendentes = pontos.filter(p => p.status === "pendente");
+    const pendentes = pontos.filter(p => String(p.status).toLowerCase() === "pendente");
     res.json(pendentes);
 });
 
 
-app.put("/admin/aprovar/:id", (req, res) => {
-
+app.put("/admin/aprovar/:id", async (req, res) => {
     const id = parseInt(req.params.id);
 
     const ponto = pontos.find(p => p.id === id);
@@ -42,13 +23,27 @@ app.put("/admin/aprovar/:id", (req, res) => {
         return res.status(404).json({ erro: "Ponto não encontrado" });
     }
 
-    ponto.status = "aprovado";
-    pontosAprovados.push(ponto);
+    ponto.status = "Aprovado";
 
-    res.json({
+    const already = pontosAprovados.find(p => p.id === id);
+    if (!already) pontosAprovados.push(ponto);
+
+    const result = {
         mensagem: "Ponto aprovado com sucesso",
         ponto
-    });
+    };
+
+    const callbackUrl = process.env.UI_CALLBACK_URL;
+    if (callbackUrl) {
+        try {
+            const resp = await axios.post(callbackUrl, ponto, { timeout: 5000 });
+            result.callback = { ok: true, status: resp.status };
+        } catch (err) {
+            result.callback = { ok: false, error: err.message };
+        }
+    }
+
+    res.json(result);
 
 });
 
