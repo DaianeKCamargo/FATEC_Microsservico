@@ -13,37 +13,32 @@ Sabrina Sant'Ana da Silva Alves;
 
 ### 📖 Descrição
 
-Este microserviço é responsável por gerenciar o cadastro e aprovação de pontos de coleta de tampinhas plásticas no sistema Tampets.
+Este microserviço é responsável por administrar pontos de coleta de tampinhas plásticas no sistema Tampets.
 
-O serviço segue o padrão de comunicação REST, permitindo que outras partes do sistema (frontend ou outros serviços) interajam através de requisições HTTP.
+Ele expõe uma API REST para a equipe administrativa listar pontos pendentes, aprovar cadastros e disponibilizar os pontos aprovados para consulta dos usuários.
 
-O fluxo principal funciona da seguinte forma:
-
-Um usuário envia um cadastro para se tornar um ponto de coleta.
-O cadastro é salvo com status pendente.
-O administrador analisa o cadastro.
-O administrador pode aprovar ou recusar o ponto de coleta.
-Após aprovação, o ponto passa a aparecer nas buscas realizadas pelos usuários.
+Os dados são mantidos em memória enquanto o servidor está em execução. Ao reiniciar a aplicação, a lista de pontos é resetada.
 
 
 ### 🏗 Arquitetura
 
-O microserviço segue uma arquitetura simples baseada em API REST utilizando Node.js e Express.js.
+O microserviço segue uma arquitetura simples baseada em API REST utilizando Node.js, Express.js e Axios.
 
 **Fluxo de comunicação:**
 
-<code>Usuário (Frontend) -> API REST -> Microserviço de Pontos de Coleta -> Banco de Dados</code>
+<code>Admin Dashboard -> API REST -> Microserviço -> Atualização dos dados</code>
 
+**Consulta pública:**
 
-**Interface administrativa:**
+<code>Frontend -> API REST -> Microserviço -> Retorno dos pontos aprovados</code>
 
-<code>Admin Dashboard -> API REST -> Microserviço -> Atualização dos dados
-</code>
+Quando configurada a variável de ambiente <code>UI_CALLBACK_URL</code>, a aprovação de um ponto também envia um callback HTTP para a interface externa.
 
 
 ### ⚙️ Tecnologias utilizadas
 - Node.js
 - Express.js
+- Axios
 - API REST
 - JSON
 
@@ -59,77 +54,54 @@ Instalar dependências <br>
 Executar o servidor <br>
 > <code>node server.js</code> <br>
 
-Servidor disponível em: [Numero da porta pode váriar dependo do localhost]<br>
-> <code>http://localhost:3000 </code> 
+Servidor disponível em:<br>
+> <code>http://localhost:5500</code>
+
+Opcionalmente, defina a URL de callback antes de iniciar o servidor:<br>
+> <code>UI_CALLBACK_URL=http://localhost:3000/callback</code>
 
 ### 🔗 Endpoints da API
-**Cadastrar ponto de coleta** <br>
-Cria um novo cadastro de ponto de coleta.
 
-> <code> POST /pontos-coleta </code><br>
-<code>Body <br>
-{<br>
- "nome": "Pet Shop Central",<br>
- "endereco": "Rua das Flores 123",<br>
- "cidade": "Campinas"<br>
-} </code> <br> 
+**Listar pontos pendentes**<br>
+Retorna todos os pontos com status <code>pendente</code>.
 
-Resposta<br>
-> <code>{<br>
- "mensagem": "Cadastro enviado para aprovação",<br>
- "ponto": {<br>
-   "id": 1,
-   "nome": "Pet Shop Central",<br>
-   "endereco": "Rua das Flores 123",<br>
-   "cidade": "Campinas",<br>
-   "status": "pendente"<br>
- }<br>
-}</code><br>
+> <code>GET /admin/pontos-pendentes</code>
 
+**Aprovar ponto de coleta**<br>
+Marca o ponto como aprovado e, se <code>UI_CALLBACK_URL</code> estiver configurada, envia os dados do ponto para a interface externa.
 
-### 👨‍💻 Endpoints Administrativos
-**Listar pontos pendentes**
-
-Retorna todos os cadastros aguardando aprovação:
-
-> <code>GET /admin/pontos-pendentes</code> <br>
-
-Aprovar ponto de coleta
-
-**Permite que o administrador aprove um cadastro:**
-
-> <code>PUT /admin/aprovar/{id}</code><br>
-
-Exemplo:<br>
-> <code>PUT /admin/aprovar/1</code>
-
-Resposta:
-
-> <code> {<br>
- "mensagem": "Ponto aprovado com sucesso"<br>
-}</code> <br>
-
-### 🔎 Buscar pontos de coleta aprovados
-
-**Retorna todos os pontos aprovados disponíveis para os usuários:**
-
-> <code> GET /pontos-coleta </code> <br>
-
-📍 Buscar pontos próximos
-
-**Permite que usuários encontrem pontos de coleta próximos:**
-
-> <code> GET /pontos-coleta/proximos + parâmetros </code>
-
-**Parâmetros**
-Parametro -> Cidade | Tipo -> String | Descrição -> Cidade do Usuário
+> <code>PUT /admin/aprovar/:id</code>
 
 Exemplo:
-> <code> GET /pontos-coleta/proximos?cidade=Campinas</code> <br>
+> <code>PUT /admin/aprovar/1</code>
+
+Resposta esperada:
+> <code>{<br>
+"mensagem": "Ponto aprovado com sucesso",<br>
+"ponto": { ... }<br>
+}</code>
+
+**Listar pontos aprovados**<br>
+Retorna todos os pontos aprovados disponíveis para consulta.
+
+> <code>GET /pontos-coleta</code>
+
+**Buscar pontos aprovados por cidade**<br>
+Filtra os pontos aprovados pela cidade informada.
+
+> <code>GET /pontos-coleta/proximos?cidade=Campinas</code>
+
+Parâmetro:
+<code>cidade</code> - cidade usada para filtrar os pontos aprovados.
 
 ---
 
 ### 🔐 Regras de funcionamento
-- Novos pontos são cadastrados com status pendente
-- Apenas administradores podem aprovar ou recusar cadastros
+- Os pontos pendentes são mantidos em memória no servidor
+- Apenas administradores podem aprovar cadastros
 - Somente pontos aprovados aparecem nas buscas dos usuários
+
+### Observação
+- Esse microsserviço está sozinho, ou seja, para ve-lo em execução acessar [Protejo Integrador 3](https://github.com/DaianeKCamargo/FATEC_ProjetoIntegrador3)
+
+
